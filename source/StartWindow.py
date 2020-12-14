@@ -70,18 +70,43 @@ class StartWindow(QMainWindow):
                 self.game_window.close()
                 self.status = 'home'
                 self.stacked_layout.setCurrentWidget(self.home_window)
-					
+                
+            else:
+            
+                #PLAYER 1
+                if self.status == 'game_window' and Qt.Key_Right in self.keys_pressed :            		
+                    self.game_window.player1._move(3,0)
+                if self.status == 'game_window' and Qt.Key_Left in self.keys_pressed :            		
+                    self.game_window.player1._move(-3,0)	
+                if self.status == 'game_window' and Qt.Key_Up in self.keys_pressed :            		
+                    self.game_window.player1._move(0,-3)		
+                if self.status == 'game_window' and Qt.Key_Down in self.keys_pressed :            		
+                    self.game_window.player1._move(0,3)	
+                
+                #PLAYER 2
+                if self.game_window.number_of_players == 2:
+                   if self.status == 'game_window' and Qt.Key_D in self.keys_pressed :            		
+                       self.game_window.player2._move(3,0)
+                   if self.status == 'game_window' and Qt.Key_A in self.keys_pressed :            		
+                       self.game_window.player2._move(-3,0)	
+                   if self.status == 'game_window' and Qt.Key_W in self.keys_pressed :            		
+                       self.game_window.player2._move(0,-3)		
+                   if self.status == 'game_window' and Qt.Key_S in self.keys_pressed :            		
+                       self.game_window.player2._move(0,3)	
+	
         
     def start(self):
        
         print('start')
         self.status = 'game_window'
+        self.game_window.new_game(1)
         self.stacked_layout.setCurrentWidget(self.game_window)
         
     def multiplayer(self):
         
         print('multiplayer')
         self.status = 'game_window'
+        self.game_window.new_game(2)
         self.stacked_layout.setCurrentWidget(self.game_window)
         
     def score(self):
