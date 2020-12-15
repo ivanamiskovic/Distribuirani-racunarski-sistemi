@@ -93,7 +93,8 @@ class StartWindow(QMainWindow):
                        self.game_window.player2._move(0,-3)		
                    if self.status == 'game_window' and Qt.Key_S in self.keys_pressed :            		
                        self.game_window.player2._move(0,3)	
-	
+	            
+                self.game_window.game_start()
         
     def start(self):
        
