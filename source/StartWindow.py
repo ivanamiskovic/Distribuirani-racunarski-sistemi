@@ -67,11 +67,23 @@ class StartWindow(QMainWindow):
             if Qt.Key_Escape in self.keys_pressed:
                 print('ESC')			
                 self.keys_pressed.remove(Qt.Key_Escape)	
-                self.game_window.close()
-                self.status = 'home'
-                self.stacked_layout.setCurrentWidget(self.home_window)
+                
+                if self.game_window.end == True:
+                   self.score()
+                   self.score_window._newScore("Player", self.game_window.better_player)
+                   if self.game_window.number_of_players == 2:
+                       self.score_window._newScore2Players("Player", self.game_window.better_player, self.game_window.worse_player)
+                   self.game_window.close()
+                else:
+                   self.game_window.end_game()
+                   self.game_window.close()			
+                   self.status = 'home'
+                   self.stacked_layout.setCurrentWidget(self.home_window)
                 
             else:
+            
+                if self.game_window.end == True:
+                    return
             
                 #PLAYER 1
                 if self.status == 'game_window' and Qt.Key_Right in self.keys_pressed :            		
@@ -95,6 +107,14 @@ class StartWindow(QMainWindow):
                        self.game_window.player2._move(0,3)	
 	            
                 self.game_window.game_start()
+                
+        elif self.status == 'score_window':
+            if Qt.Key_Escape in self.keys_pressed:
+                print('ESC')			
+                self.keys_pressed.remove(Qt.Key_Escape)	
+                self.score_window.close()
+                self.status = 'home'
+                self.stacked_layout.setCurrentWidget(self.home_window)
         
     def start(self):
        
