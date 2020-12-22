@@ -27,10 +27,14 @@ class HomeWindow(QWidget):
         #Kreirala sam Multiplayer button.
         self.main_multi_button = ImageButton('menu3', self)
         self.main_multi_button.setGeometry(389, 198, 251, 72)
+        
+        #Kreirala sam Tournament button.
+        self.main_tournament_button = ImageButton('menu5', self)
+        self.main_tournament_button.setGeometry(389, 270, 251, 72)
     
         #Kreirala sam Score button.
         self.main_score_button = ImageButton('menu4', self)
-        self.main_score_button.setGeometry(389, 270, 251, 72)
+        self.main_score_button.setGeometry(36, 18, 251, 72)
 		
         #Kreirala sam Quit button.
         self.main_quit_button = ImageButton('menu2', self)

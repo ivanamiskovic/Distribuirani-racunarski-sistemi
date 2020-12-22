@@ -20,6 +20,9 @@ class GameWindow(QWidget):
     end = False
     better_player = 0
     worse_player = 0
+    tournament = False
+    tournament_round = -1
+    tournament_players = 0
 
     def __init__(self):
         super().__init__()
@@ -45,9 +48,15 @@ class GameWindow(QWidget):
         
         self.show()
         
-    def new_game(self, player_num):
+    def new_game(self, player_num, t_round, t_players):
            
-        self.number_of_players = player_num
+        if player_num == 3:
+            self.number_of_players = 2
+            self.tournament_round = t_round
+            self.tournament_players = t_players
+            self.tournament = True
+        else:
+            self.number_of_players = player_num
 
         self.road_add()
         
@@ -64,6 +73,7 @@ class GameWindow(QWidget):
     #################################
     #MAIN GAME THREAD
     def game_start(self): 
+        
         
         #Generating new cars after they go too far down
         for x in range(len(self.cars)):
@@ -199,7 +209,7 @@ class GameWindow(QWidget):
         
         self.player_life_label = QLabel(self)
         self.player_life_label.setFixedWidth(640)	
-        self.player_life_label.move(-50, 20)
+        self.player_life_label.move(-75, 20)
         self.player_life_label.setAlignment(Qt.AlignCenter)
         self.player_life_label.setText("0")		
         self.player_life_label.setFont(self.font)
@@ -219,14 +229,62 @@ class GameWindow(QWidget):
            
            self.player_life_label2 = QLabel(self)
            self.player_life_label2.setFixedWidth(640)	
-           self.player_life_label2.move(50, 20)
+           self.player_life_label2.move(75, 20)
            self.player_life_label2.setAlignment(Qt.AlignCenter)
            self.player_life_label2.setText("0")		
            self.player_life_label2.setFont(self.font)
            self.player_life_label2.setStyleSheet('color: limegreen')
            self.player_life_label2.setGraphicsEffect(shadow4)
         
-        
+        if self.tournament == True:
+            
+           print("round game_window ", self.tournament_round) 
+           if self.tournament_round == 4:
+               _round = self.create_label()
+               _round.setText("1")
+           elif self.tournament_round == 3:
+               _round = self.create_label()
+               _round.setText("2")
+           elif self.tournament_round == 2:
+               _round = self.create_label()
+               _round.setText("3")
+           elif self.tournament_round == 1:
+               _round = self.create_label()
+               _round.setText("4")
+           else:
+               print("error in setting labels for rounds")
+               
+           best_score = 0
+           for i in range(len(self.tournament_players)):
+               if best_score <= self.tournament_players[i]:
+                   best_score = self.tournament_players[i]
+                   
+           best_shadow = QGraphicsDropShadowEffect(self)
+           best_shadow.setBlurRadius(2)
+           best_shadow.setOffset(2)
+           best_round = QLabel(self)
+           best_round.setFixedWidth(640)
+           best_round.move(0, 100)
+           best_round.setAlignment(Qt.AlignCenter)
+           best_round.setText("{0}".format(best_score))
+           best_round.setFont(self.font)
+           best_round.setStyleSheet('color: yellow')
+           best_round.setGraphicsEffect(best_shadow)   
+
+
+    def create_label(self):
+        t_shadow = QGraphicsDropShadowEffect(self)
+        t_shadow.setBlurRadius(2)
+        t_shadow.setOffset(2)
+        t_round = QLabel(self)
+        t_round.setFixedWidth(640)
+        t_round.move(0, 20)
+        t_round.setAlignment(Qt.AlignCenter)
+        t_round.setText("0")
+        t_round.setFont(self.font)
+        t_round.setStyleSheet('color: yellow')
+        t_round.setGraphicsEffect(t_shadow)   
+        return t_round
 
     #Game over - score showing 
     def end_game(self):
@@ -255,6 +313,7 @@ class GameWindow(QWidget):
         self.end_label.setStyleSheet('color: yellow')
         self.end_label.setGraphicsEffect(shadow)
         self.end_label.show()
+        
         
     def closeEvent(self, event):
 

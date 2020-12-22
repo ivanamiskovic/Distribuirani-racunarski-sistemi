@@ -12,6 +12,9 @@ from source.ScoreWindow import *
 class StartWindow(QMainWindow):
     APP_TITLE = "Cars Racing"
     
+    tournament_round = 4
+    tournament_players = []
+    
     def __init__(self, *args, **kwargs):
 
         super(StartWindow, self).__init__(*args, **kwargs)
@@ -32,10 +35,7 @@ class StartWindow(QMainWindow):
         #HomeWindow dodajemo na StackLayout
         self.stacked_layout.addWidget(self.home_window)
 		
-        #Kreiramo GameWindow
-        self.game_window = GameWindow()
-        #GameWindow dodajemo na StackLayout
-        self.stacked_layout.addWidget(self.game_window)
+        
         
         #Kreiramo ScoreWindow
         self.score_window = ScoreWindow()
@@ -50,6 +50,7 @@ class StartWindow(QMainWindow):
         #Konekcije za button-e u Meni-ju
         self.home_window.main_play_button.clicked.connect(self.start)
         self.home_window.main_multi_button.clicked.connect(self.multiplayer)
+        self.home_window.main_tournament_button.clicked.connect(self.tournament)
         self.home_window.main_score_button.clicked.connect(self.score)
         self.home_window.main_quit_button.clicked.connect(self.quit)
 
@@ -69,14 +70,55 @@ class StartWindow(QMainWindow):
                 self.keys_pressed.remove(Qt.Key_Escape)	
                 
                 if self.game_window.end == True:
-                   self.score()
-                   self.score_window._newScore("Player", self.game_window.better_player)
-                   if self.game_window.number_of_players == 2:
-                       self.score_window._newScore2Players("Player", self.game_window.better_player, self.game_window.worse_player)
-                   self.game_window.close()
+                   
+                   #TOURNAMENT
+                   if self.game_window.tournament == True and self.tournament_round > 0:
+                       self.tournament_players.append(self.game_window.player1.score)
+                       self.tournament_players.append(self.game_window.player2.score)
+                       self.game_window.close()
+                       del self.game_window
+                       self.create_game_window()
+                       self.tournament_round -= 1
+                       if self.tournament_round != 0:
+                          self.tournament()
+                       
+
+                       print(self.tournament_players)
+                       
+                   if self.tournament_round == 0:
+                       print("Tournament ending")
+                       self.tournament_round = 4
+                       self.game_window.tournament = False
+                       self.score()
+                       best = 0
+                       for i in range(len(self.tournament_players)):
+                          if best <= self.tournament_players[i]:
+                            best = self.tournament_players[i]
+                       self.score_window._newScore("Player", best) 
+                       self.tournament_players = []
+                       self.game_window.close()
+                       del self.game_window
+                   #END TOURNAMENT ^^^^
+                   
+                   elif self.game_window.tournament == False:
+                      print("Regular ending")
+                      self.score()
+                      self.score_window._newScore("Player", self.game_window.better_player)
+                      if self.game_window.number_of_players == 2:
+                          self.score_window._newScore2Players("Player", self.game_window.better_player, self.game_window.worse_player)
+                      self.game_window.close()
+                      del self.game_window
+                      
+                   else:
+                      print("error in checking if tournament is on [StartWindow]")
                 else:
+                   if self.game_window.tournament == True:
+                       self.tournament_round = 4
+                       self.game_window.tournament = False
+                       self.tournament_players = []
                    self.game_window.end_game()
-                   self.game_window.close()			
+                   self.game_window.close()	
+                   del self.game_window                   
                    self.status = 'home'
                    self.stacked_layout.setCurrentWidget(self.home_window)
                 
@@ -106,7 +148,8 @@ class StartWindow(QMainWindow):
                    if self.status == 'game_window' and Qt.Key_S in self.keys_pressed :            		
                        self.game_window.player2._move(0,3)	
 	            
-                self.game_window.game_start()
+                if self.game_window != None:
+                   self.game_window.game_start()
                 
         elif self.status == 'score_window':
             if Qt.Key_Escape in self.keys_pressed:
@@ -117,18 +160,35 @@ class StartWindow(QMainWindow):
                 self.stacked_layout.setCurrentWidget(self.home_window)
         
     def start(self):
-       
+         
+        self.create_game_window() 
         print('start')
         self.status = 'game_window'
-        self.game_window.new_game(1)
+        self.game_window.new_game(1, -1, -1)
         self.stacked_layout.setCurrentWidget(self.game_window)
         
     def multiplayer(self):
         
+        self.create_game_window()      
         print('multiplayer')
         self.status = 'game_window'
-        self.game_window.new_game(2)
+        self.game_window.new_game(2, -1, -1)
         self.stacked_layout.setCurrentWidget(self.game_window)
+    
+    def tournament(self):
+        
+        self.create_game_window() 
+        print('tournament')
+        self.status = 'game_window'
+        self.game_window.new_game(3, self.tournament_round, self.tournament_players)
+        self.stacked_layout.setCurrentWidget(self.game_window)
+        
+    def create_game_window(self):
+        #Kreiramo GameWindow
+        self.game_window = GameWindow()
+        #GameWindow dodajemo na StackLayout
+        self.stacked_layout.addWidget(self.game_window)
+        
         
     def score(self):
 

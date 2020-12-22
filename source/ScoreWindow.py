@@ -78,6 +78,7 @@ class ScoreWindow(QWidget):
         self.label_input.hide()
 
         self._loadScore()
+        self._showScore()
         self.show()
 
     def _writeScore(self):
